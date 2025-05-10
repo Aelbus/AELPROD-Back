@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: AELPROD Backend API
+  version: 1.0.0
+  description: Documentation de l'API backend AELPROD (devis, templates, commentaires, email)
+servers:
+  - url: https://aelprod-back.onrender.com/api
+
+paths:
+  /quotes:
+    get:
+      summary: Récupérer tous les devis
+      responses:
+        "200":
+          description: Liste des devis
+
+    post:
+      summary: Créer un nouveau devis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                service:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Devis créé
+
+    delete:
+      summary: Supprimer un devis par ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Devis supprimé
+
+  /templates:
+    get:
+      summary: Récupérer tous les templates
+      responses:
+        "200":
+          description: Liste des templates
+
+    post:
+      summary: Ajouter un template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: Template ajouté
+
+    delete:
+      summary: Supprimer un template par ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Template supprimé
+
+  /comments:
+    get:
+      summary: Récupérer tous les commentaires
+      responses:
+        "200":
+          description: Liste des commentaires
+
+    post:
+      summary: Ajouter un commentaire
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                text:
+                  type: string
+                rating:
+                  type: integer
+      responses:
+        "200":
+          description: Commentaire ajouté
+
+    delete:
+      summary: Supprimer un commentaire par ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Commentaire supprimé
+
+  /send-mail:
+    post:
+      summary: Envoyer un email depuis le backend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                service:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Email envoyé

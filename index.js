@@ -4,10 +4,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
+
 const adminRoutes = require("./routes/admin");
 
 const app = express();
-
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://aelprod.com"],
@@ -16,6 +16,7 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+
 app.use("/api", adminRoutes);
 
 // ======================= CONTACT ROUTE =======================
@@ -42,11 +43,13 @@ app.post("/api/contact", async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    const messages = JSON.parse(
-      fs.readFileSync("./data/messages.json", "utf-8")
-    );
+    const messagesPath = "./data/messages.json";
+    const messages = fs.existsSync(messagesPath)
+      ? JSON.parse(fs.readFileSync(messagesPath, "utf-8"))
+      : [];
+
     messages.push({ id: Date.now().toString(), name, email, message });
-    fs.writeFileSync("./data/messages.json", JSON.stringify(messages, null, 2));
+    fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2));
 
     res.json({ success: true, message: "Message envoyé avec succès !" });
   } catch (err) {
@@ -58,6 +61,7 @@ app.post("/api/contact", async (req, res) => {
 // ======================= LOGIN ROUTE =======================
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
+
   const adminEmail = process.env.ADMIN_EMAIL?.trim();
   const adminPassword = process.env.ADMIN_PASSWORD?.trim();
 
@@ -72,125 +76,58 @@ app.post("/api/login", (req, res) => {
 
 // ======================= TEMPLATES ROUTES =======================
 app.get("/api/templates", (req, res) => {
-  try {
-    const templates = JSON.parse(
-      fs.readFileSync("./data/templates.json", "utf-8")
-    );
-    res.json(templates);
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const templates = JSON.parse(fs.readFileSync("./data/templates.json"));
+  res.json(templates);
 });
 
 app.post("/api/templates", (req, res) => {
-  if (req.headers.authorization !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "Non autorisé" });
-  }
-  try {
-    const templates = JSON.parse(
-      fs.readFileSync("./data/templates.json", "utf-8")
-    );
-    const newTemplate = { id: Date.now().toString(), ...req.body };
-    templates.push(newTemplate);
-    fs.writeFileSync(
-      "./data/templates.json",
-      JSON.stringify(templates, null, 2)
-    );
-    res.json(newTemplate);
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const templates = JSON.parse(fs.readFileSync("./data/templates.json"));
+  const newTemplate = { id: Date.now().toString(), ...req.body };
+  templates.push(newTemplate);
+  fs.writeFileSync("./data/templates.json", JSON.stringify(templates, null, 2));
+  res.json(newTemplate);
 });
 
 app.delete("/api/templates/:id", (req, res) => {
-  if (req.headers.authorization !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "Non autorisé" });
-  }
-  try {
-    const templates = JSON.parse(
-      fs.readFileSync("./data/templates.json", "utf-8")
-    );
-    const updatedTemplates = templates.filter((t) => t.id !== req.params.id);
-    fs.writeFileSync(
-      "./data/templates.json",
-      JSON.stringify(updatedTemplates, null, 2)
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const templates = JSON.parse(fs.readFileSync("./data/templates.json"));
+  const updatedTemplates = templates.filter((t) => t.id !== req.params.id);
+  fs.writeFileSync(
+    "./data/templates.json",
+    JSON.stringify(updatedTemplates, null, 2)
+  );
+  res.json({ success: true });
 });
 
 // ======================= QUOTES ROUTES =======================
 app.get("/api/quotes", (req, res) => {
-  try {
-    const quotes = JSON.parse(fs.readFileSync("./data/quotes.json", "utf-8"));
-    res.json(quotes);
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const quotes = JSON.parse(fs.readFileSync("./data/quotes.json"));
+  res.json(quotes);
 });
 
 app.delete("/api/quotes/:id", (req, res) => {
-  if (req.headers.authorization !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "Non autorisé" });
-  }
-  try {
-    const quotes = JSON.parse(fs.readFileSync("./data/quotes.json", "utf-8"));
-    const updatedQuotes = quotes.filter((q) => q.id !== req.params.id);
-    fs.writeFileSync(
-      "./data/quotes.json",
-      JSON.stringify(updatedQuotes, null, 2)
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const quotes = JSON.parse(fs.readFileSync("./data/quotes.json"));
+  const updatedQuotes = quotes.filter((q) => q.id !== req.params.id);
+  fs.writeFileSync(
+    "./data/quotes.json",
+    JSON.stringify(updatedQuotes, null, 2)
+  );
+  res.json({ success: true });
 });
 
 // ======================= COMMENTS ROUTES =======================
 app.get("/api/comments", (req, res) => {
-  try {
-    const comments = JSON.parse(
-      fs.readFileSync("./data/comments.json", "utf-8")
-    );
-    res.json(comments);
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
-});
-
-app.post("/api/comments", (req, res) => {
-  try {
-    const comments = JSON.parse(
-      fs.readFileSync("./data/comments.json", "utf-8")
-    );
-    const newComment = { id: Date.now().toString(), ...req.body };
-    comments.push(newComment);
-    fs.writeFileSync("./data/comments.json", JSON.stringify(comments, null, 2));
-    res.json(newComment);
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const comments = JSON.parse(fs.readFileSync("./data/comments.json"));
+  res.json(comments);
 });
 
 app.delete("/api/comments/:id", (req, res) => {
-  if (req.headers.authorization !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "Non autorisé" });
-  }
-  try {
-    const comments = JSON.parse(
-      fs.readFileSync("./data/comments.json", "utf-8")
-    );
-    const updatedComments = comments.filter((c) => c.id !== req.params.id);
-    fs.writeFileSync(
-      "./data/comments.json",
-      JSON.stringify(updatedComments, null, 2)
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
+  const comments = JSON.parse(fs.readFileSync("./data/comments.json"));
+  const updatedComments = comments.filter((c) => c.id !== req.params.id);
+  fs.writeFileSync(
+    "./data/comments.json",
+    JSON.stringify(updatedComments, null, 2)
+  );
+  res.json({ success: true });
 });
 
 // ======================= START SERVER =======================

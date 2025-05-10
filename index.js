@@ -28,14 +28,14 @@ app.post("/api/contact", async (req, res) => {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     });
 
     const mailOptions = {
-      from: `"${name}" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
+      from: `"${name}" <${process.env.SMTP_USER}>`,
+      to: process.env.SMTP_USER,
       subject: `Nouveau message de ${name}`,
       text: `Email: ${email}\n\nMessage:\n${message}`,
     };

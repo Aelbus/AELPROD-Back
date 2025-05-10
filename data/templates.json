@@ -1,8 +1,32 @@
 [
   {
-    "id": "1746893550708",
-    "name": "Portfolio",
+    "id": "1",
+    "title": "Portfolio HTML/CSS classique",
+    "price": "355€ TTC",
+    "desc": "Site portfolio simple, responsive et optimisé."
+  },
+  {
+    "id": "2",
+    "title": "Portfolio React avancé",
     "price": "555€ TTC",
-    "description": "site portfolio en HTML/CSS"
+    "desc": "Portfolio interactif en React avec animations modernes."
+  },
+  {
+    "id": "3",
+    "title": "Site vitrine + MAJ manuel mensuel ",
+    "price": "1055€ TTC - (suivi 95€/mois TTC)",
+    "desc": "Site vitrine avec ajout de contenu manuel, sur demande avec suivi personnel."
+  },
+  {
+    "id": "4",
+    "title": "Site vitrine avec backend + API",
+    "price": "1555€ TTC",
+    "desc": "Site complet avec backend Node.js/API pour fonctionnalités dynamiques."
+  },
+  {
+    "id": "5",
+    "title": "Projet ambitieux à discuter",
+    "price": "Sur devis",
+    "desc": "Projet sur mesure, besoin d'une discussion préalable."
   }
 ]

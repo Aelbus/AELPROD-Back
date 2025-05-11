@@ -27,15 +27,23 @@ app.post("/api/contact", async (req, res) => {
   const { name, email, message } = req.body;
 
   try {
+    // Configuration corrigée pour Infomaniak avec 2FA
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT) || 465,
-      secure: true,
+      port: Number(process.env.MAIL_PORT),
+      secure: true, // toujours true pour le port 465
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.EMAIL_USER, // adresse email complète
+        pass: process.env.EMAIL_PASS, // mot de passe d'application
+      },
+      tls: {
+        rejectUnauthorized: true,
+        minVersion: "TLSv1.2",
       },
     });
+
+    // Vérifier la connexion avant d'envoyer
+    await transporter.verify();
 
     const mailOptions = {
       from: `"${name}" <${process.env.EMAIL_USER}>`,
@@ -43,7 +51,7 @@ app.post("/api/contact", async (req, res) => {
       subject: `Nouveau message de ${name}`,
       text: `Email: ${email}\n\nMessage:\n${message}`,
     };
-
+    console.log("Tentative d'envoi : ", mailOptions);
     await transporter.sendMail(mailOptions);
 
     const messagesPath = "./data/messages.json";

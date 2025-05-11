@@ -5,13 +5,18 @@ const router = express.Router();
 require("dotenv").config();
 
 // =================== Transporter email ===================
+// Configuration corrigée pour Infomaniak avec 2FA
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: parseInt(process.env.MAIL_PORT),
-  secure: true,
+  secure: true, // toujours true pour le port 465
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER, // adresse email complète
+    pass: process.env.EMAIL_PASS, // mot de passe d'application
+  },
+  tls: {
+    rejectUnauthorized: true,
+    minVersion: "TLSv1.2",
   },
 });
 
@@ -23,7 +28,7 @@ router.post("/login", (req, res) => {
     email.trim() === process.env.ADMIN_EMAIL &&
     password.trim() === process.env.ADMIN_PASSWORD
   ) {
-    res.json({ success: true, message: "Connexion réussie !" });
+    res.json({ success: true, message: "Connexion réussie !" });
   } else {
     res
       .status(401)
@@ -96,6 +101,8 @@ router.post("/quotes", async (req, res) => {
   };
 
   try {
+    // Vérifier la connexion avant d'envoyer
+    await transporter.verify();
     await transporter.sendMail(mailOptions);
     res.json({
       success: true,
